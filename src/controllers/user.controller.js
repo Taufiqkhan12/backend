@@ -64,12 +64,12 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   if (existedUser) {
-    // Check if avatar file exists and delete it
+    // Check if avatar file exists on the server and delete it
     if (avatarLocalPath && fs.existsSync(avatarLocalPath)) {
       fs.unlinkSync(avatarLocalPath);
     }
 
-    // Check if cover image file exists and delete it
+    // Check if cover image file exists on the server and delete it
     if (coverImageLocalPath && fs.existsSync(coverImageLocalPath)) {
       fs.unlinkSync(coverImageLocalPath);
     }
