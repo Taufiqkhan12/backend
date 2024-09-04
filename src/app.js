@@ -22,4 +22,18 @@ import userRoute from "./routes/user.routes.js";
 // routes declaration
 app.use("/api/v1/users", userRoute);
 
+app.use((err, req, res, next) => {
+  // Log the error for debugging purposes
+  console.error(err.stack);
+
+  // Send a structured JSON response
+  res.status(err.statusCode || 500).json({
+    success: err.success,
+    statusCode: err.statusCode || 500,
+    message: err.message,
+    errors: err.errors || [],
+    stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
+  });
+});
+
 export { app };
