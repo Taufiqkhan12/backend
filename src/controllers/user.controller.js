@@ -51,16 +51,34 @@ const registerUser = asyncHandler(async (req, res) => {
     $or: [{ username }, { email }],
   });
 
-  // if (existedUser) {
+  // // if (existedUser) {
+  // // }
+
+  // const avatarLocalPath = req.files?.avatar[0]?.path;
+  // // console.log(avatarLocalPath);
+  // // const coverImageLocalPath = req.files?.coverImage[0]?.path;
+
+  // let coverImageLocalPath;
+  // if (
+  //   req.files &&
+  //   Array.isArray(req.files.coverImage) &&
+  //   req.files.coverImage.length > 0
+  // ) {
+  //   coverImageLocalPath = req.files.coverImage[0].path;
   // }
 
-  const avatarLocalPath = req.files?.avatar[0]?.path;
-  // console.log(avatarLocalPath);
-  // const coverImageLocalPath = req.files?.coverImage[0]?.path;
+  let avatarLocalPath, coverImageLocalPath;
 
-  let coverImageLocalPath;
   if (
-    req.files &&
+    req.files?.avatar &&
+    Array.isArray(req.files.avatar) &&
+    req.files.avatar.length > 0
+  ) {
+    avatarLocalPath = req.files.avatar[0].path;
+  }
+
+  if (
+    req.files?.coverImage &&
     Array.isArray(req.files.coverImage) &&
     req.files.coverImage.length > 0
   ) {
@@ -356,21 +374,21 @@ const updateCoverImage = asyncHandler(async (req, res) => {
 
     const updatedCoverImage = await uploadOnCloudinary(coverImageLocalPath);
 
-    if (!updatedCoverImage.url && !updatedCoverImage.public_id) {
+    if (!updatedCoverImage.url || !updatedCoverImage.public_id) {
       throw new ApiError(500, "Error while updating file");
     }
 
-    const user = await User.findById(req.user?._id).select("-password ");
+    const user = await User.findById(req.user?._id).select("-password");
 
     const deletedOldFile = await deleteImageFromCloudinary(
-      user.coverImage.publicId
+      user.coverImage?.publicId
     );
 
     if (!deletedOldFile) {
-      throw new ApiError(500, "Error while updating file");
+      throw new ApiError(500, "Error while deleting old cover image file");
     }
 
-    user.avatar = {
+    user.coverImage = {
       url: updatedCoverImage.url,
       publicId: updatedCoverImage.public_id,
     };
@@ -381,7 +399,7 @@ const updateCoverImage = asyncHandler(async (req, res) => {
       .status(200)
       .json(new ApiResponse(200, user, "CoverImage updated sucessfully"));
   } catch (error) {
-    throw new ApiError(500, "Error:", error);
+    throw new ApiError(500, "Error:", error.message);
   }
 });
 
