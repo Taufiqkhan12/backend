@@ -8,8 +8,8 @@ import {
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import fs from "fs";
-import { url } from "inspector";
-import { subscribe } from "diagnostics_channel";
+// import { url } from "inspector";
+// import { subscribe } from "diagnostics_channel";
 import mongoose from "mongoose";
 
 const generateAccessAndRefreshToken = async (userId) => {
@@ -425,7 +425,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     {
       $lookup: {
         from: "subscriptions",
-        localField: _id,
+        localField: "_id",
         foreignField: "channel",
         as: "subscribers",
       },
